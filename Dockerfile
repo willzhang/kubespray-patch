@@ -15,6 +15,16 @@ ENV PACKAGES=/kubespray/packages
 ENV PACKAGES_CACHE=/kubespray/packages_cache
 ENV skopeo_bin_version=v1.9.3
 
+# install tools
+RUN mkdir -p $PACKAGES \
+    && mkdir -p $PACKAGES_CACHE \
+    && wget -q --no-check-certificate https://github.com/lework/skopeo-binary/releases/download/${skopeo_bin_version}/skopeo-linux-amd64 \
+    && mv skopeo-linux-amd64 /usr/local/bin/skopeo \
+    && chmod +x /usr/local/bin/skopeo \
+    && wget -q https://dl.min.io/client/mc/release/linux-amd64/mc \
+    && mv mc /usr/local/bin/ \
+    && chmod +x /usr/local/bin/mc
+
 RUN apt update -qq \
     && apt install -q -y --no-install-recommends git wget nano vim
 
@@ -53,16 +63,6 @@ COPY patches/ /kubespray/
 RUN wget -q "https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml" \
     && sed -ie "s#quay.io/tigera/operator:${CALICO_OPERATOR_VERSION}#{{ calico_operator_image_repo }}:{{ calico_operator_image_tag }}#g" tigera-operator.yaml \
     && mv tigera-operator.yaml /kubespray/roles/network_plugin/calico/templates/tigera-operator.yml.j2
-
-# install tools
-RUN mkdir -p $PACKAGES \
-    && mkdir -p $PACKAGES_CACHE \
-    && wget -q --no-check-certificate https://github.com/lework/skopeo-binary/releases/download/${skopeo_bin_version}/skopeo-linux-amd64 \
-    && mv skopeo-linux-amd64 /usr/local/bin/skopeo \
-    && chmod +x /usr/local/bin/skopeo \
-    && wget -q https://dl.min.io/client/mc/release/linux-amd64/mc \
-    && mv mc /usr/local/bin/ \
-    && chmod +x /usr/local/bin/mc
 
 COPY --from=builder0 /auth /auth
 COPY kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}.tar.gz ${PACKAGES}/
