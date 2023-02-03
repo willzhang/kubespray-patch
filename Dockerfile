@@ -15,6 +15,10 @@ ENV PACKAGES=/kubespray/packages
 ENV PACKAGES_CACHE=/kubespray/packages_cache
 ENV skopeo_bin_version=v1.11.0
 
+RUN apt update -qq \
+    && apt install -q -y --no-install-recommends git wget nano vim \
+    && rm -rf /var/lib/apt/lists/*
+
 # install tools
 RUN mkdir -p $PACKAGES \
     && mkdir -p $PACKAGES_CACHE \
@@ -24,10 +28,6 @@ RUN mkdir -p $PACKAGES \
     && wget -q https://dl.min.io/client/mc/release/linux-amd64/mc \
     && mv mc /usr/local/bin/ \
     && chmod +x /usr/local/bin/mc
-
-RUN apt update -qq \
-    && apt install -q -y --no-install-recommends git wget nano vim \
-    && rm -rf /var/lib/apt/lists/*
 
 # patch image bug
 RUN rm -rf /kubespray/ && cd / \
