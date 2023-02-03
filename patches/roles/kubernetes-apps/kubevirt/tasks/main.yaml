@@ -28,8 +28,8 @@
       loop:
         - kubevirt-operator.yaml
         - cdi-operator.yaml
-    
-    - name: "addons | apply kubevirt yamls"
+
+    - name: "addons | apply kubevirt-operator yamls"
       kube:
         state: latest
         kubectl: "{{ bin_dir }}/kubectl"
@@ -39,6 +39,14 @@
         - "{{ kube_config_dir }}/kubernetes-apps/kubevirt-operator.yaml"
         - "{{ kube_config_dir }}/kubernetes-apps/kubevirt-cr.yaml"
 
+    - name: Wait till kubevirt-operator is Deployed
+      shell: "{{ bin_dir }}/kubectl -n kubevirt get kubevirt | grep kubevirt | awk '{print $3}'"
+      register: kubevirt_operator_status
+      until: kubevirt_operator_status.stdout == "Deployed"
+      retries: 15
+      delay: 15
+      ignore_errors: true
+
     - name: "addons | apply cdi operator yamls"
       kube:
         state: latest
@@ -47,16 +55,8 @@
         wait: yes
       with_items:
         - "{{ kube_config_dir }}/kubernetes-apps/cdi-operator.yaml"
-
-    - name: "addons | apply cdi cr yamls"
-      kube:
-        state: latest
-        kubectl: "{{ bin_dir }}/kubectl"
-        filename: "{{ item }}"
-        namespace: cdi
-        wait: yes
-      with_items:
         - "{{ kube_config_dir }}/kubernetes-apps/cdi-cr.yaml"
+
   when:
     - uninstall is undefined
     - inventory_hostname == groups["kube_control_plane"][0]
