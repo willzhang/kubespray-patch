@@ -1,0 +1,122 @@
+name: kubespray-packages
+on:
+   workflow_dispatch:
+#  push:
+#    branches:
+#      - main
+
+env:
+  KUBESPRAY_VERSION: v2.21.0
+  KUBERNETES_VERSION: v1.25.6
+  PACKAGE_VERSION: v1.0
+  CALICO_VERSION: v3.24.5
+  CALICO_OPERATOR_VERSION: v1.28.5
+  REGISTRY: registry.cn-shenzhen.aliyuncs.com/cnmirror
+  DIST_PATH: ${{ github.workspace }}/kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}
+  IMAGES_LIST: kubespray/contrib/offline/temp/images.list
+
+jobs:
+  kubespray:
+    runs-on: ubuntu-22.04     
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2   
+        with:
+          driver-opts: network=host
+          
+      - name: Login to Aliyun Container Registry (ACR)
+        uses: docker/login-action@v2
+        with:
+          registry: registry.cn-shenzhen.aliyuncs.com
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          password: ${{ secrets.ALIYUN_PASSWORD }}
+
+      - name: Login to dockerhub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: checkout kubespray
+        run: |
+          mkdir auth
+          docker run --entrypoint htpasswd httpd:2 -Bbn admin Registry#123 > auth/htpasswd
+          mkdir -p ${DIST_PATH}
+          cp -r auth ${DIST_PATH}
+      - name: checkout kubespray
+        run: |
+          git clone https://github.com/kubernetes-sigs/kubespray.git -b ${KUBESPRAY_VERSION} --depth=1
+          bash kubespray/contrib/offline/generate_list.sh
+      - name: patch calico operator image
+        run: |
+          echo "quay.io/tigera/operator:${CALICO_OPERATOR_VERSION}" >> $IMAGES_LIST
+          echo "docker.io/calico/csi:${CALICO_VERSION}" >> $IMAGES_LIST
+          echo "docker.io/calico/node-driver-registrar:${CALICO_VERSION}" >> $IMAGES_LIST
+      - name: download images
+        run: |
+          wget https://github.com/lework/skopeo-binary/releases/download/v1.9.3/skopeo-linux-amd64
+          sudo mv skopeo-linux-amd64 /usr/local/bin/skopeo
+          sudo chmod +x /usr/local/bin/skopeo
+          mkdir -p ${DIST_PATH}/images
+          for image in $(cat $IMAGES_LIST)
+          do 
+            skopeo --insecure-policy copy docker://${image} oci:${DIST_PATH}/images:${image} --dest-shared-blob-dir ${DIST_PATH}/images/
+          done
+          cp ${IMAGES_LIST} ${DIST_PATH}/
+          cat ${IMAGES_LIST} | grep -Ev "registry.k8s.io/kube|registry.k8s.io/pause" |  awk -F/ '{print $2}' | sort -u > ${DIST_PATH}/harbor_projects.list
+          echo kubernetes >> ${DIST_PATH}/harbor_projects.list
+          
+      - name: download files
+        env:
+          FILES_LIST: ./kubespray/contrib/offline/temp/files.list
+        run: |
+          wget -q -x -P files -i ${FILES_LIST}
+          wget https://github.com/lework/kubeadm-certs/releases/download/${KUBERNETES_VERSION}/kubeadm-linux-amd64
+          mv kubeadm-linux-amd64 files/storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubeadm
+          cp -r files ${DIST_PATH}
+      - name: generate packages.urls
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile.ubuntu2204
+          platforms: linux/amd64
+          outputs: type=local,dest=.
+
+      - name: download packages
+        env:
+          PACKAGES_LIST: ./packages.urls
+          PKGS: ".common[],.ubuntu2204[]"
+        run: |
+          mkdir debs
+          wget -q -P debs -i $PACKAGES_LIST
+          wget --no-check-certificate https://github.com/aptly-dev/aptly/releases/download/v1.5.0/aptly_1.5.0_linux_amd64.tar.gz
+          tar xzf aptly_1.5.0_linux_amd64.tar.gz
+          sudo mv aptly_1.5.0_linux_amd64/aptly /usr/local/bin
+          gpg --quick-gen-key --batch --passphrase '123456' kubespray
+          aptly repo create -distribution="jammy" -comment="kubespray repository" kubespray
+          aptly repo add kubespray debs/*
+          aptly snapshot create kubespray_snapshot from repo kubespray
+          aptly publish snapshot -distribution="jammy" -architectures="amd64" -gpg-key="$(gpg --list-keys kubespray| sed -n '2p')" -passphrase="123456" --batch=true kubespray_snapshot
+          cp -r ${HOME}/.aptly/public /${DIST_PATH}/public
+          gpg --export --armor kubespray > ${DIST_PATH}/public/gpg
+      - name: tar packages
+        run: |
+          ls ${DIST_PATH}
+          tar -zcvf kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}.tar.gz -C ${DIST_PATH} .
+      - name: Build and Push Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile.package
+          push: true
+          tags: ${{ env.REGISTRY }}/kubespray:${{ env.KUBESPRAY_VERSION }}
+          build-args: |
+            KUBESPRAY_VERSION=${{ env.KUBESPRAY_VERSION }}
+            KUBERNETES_VERSION=${{ env.KUBERNETES_VERSION }}
+            PACKAGE_VERSION=${{ env.PACKAGE_VERSION }}
+            CALICO_VERSION=${{ env.CALICO_VERSION }}
+            CALICO_OPERATOR_VERSION=${{ env.CALICO_OPERATOR_VERSION }}
