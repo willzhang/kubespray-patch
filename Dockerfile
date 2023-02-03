@@ -18,14 +18,14 @@ ENV skopeo_bin_version=v1.9.3
 RUN apt update -qq \
     && apt install -q -y --no-install-recommends git wget nano vim
 
-# kubespray image bug fix
+# patch image bug fix
 RUN rm -rf /kubespray/ && cd / \
     && git clone https://github.com/kubernetes-sigs/kubespray.git -b ${KUBESPRAY_VERSION} --depth=1 /kubespray && cd /kubespray \
     && pip install ruamel.yaml jmespath \
     && sed -i "8,12s/^/#/" /kubespray/roles/container-engine/cri-o/tasks/cleanup.yaml \
     && cp -r /kubespray/roles/network_plugin/calico /kubespray/roles/network_plugin/calico.bak
 
-# replace kubeadm_sha256sum
+# patch kubeadm_sha256sum
 RUN wget -q https://github.com/lework/kubeadm-certs/releases/download/${KUBERNETES_VERSION}/kubeadm-linux-amd64 \
     && export kubeadm_sha256sum=$(sha256sum kubeadm-linux-amd64 | cut -d " " -f 1) \
     && file_path="./roles/download/defaults/main.yml" \
