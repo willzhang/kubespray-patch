@@ -1,0 +1,12 @@
+image:
+  repository: "{{ registry_host }}/"
+localprovisioner:
+  basePath: "/var/openebs/local"
+  hostpathClass:
+    isDefaultClass: true
+  deviceClass:
+    enabled: false
+ndm:
+  enabled: false
+ndmOperator:
+  enabled: false

@@ -1,0 +1,10 @@
+- name: create certs file
+  file:
+    path: "/etc/containers/certs.d/{{ registry_host }}"
+    state: directory
+    mode: '0755'
+
+- name: copy registry ca.crt for container registry
+  copy:
+    src: "{{ registry_host }}.crt"
+    dest: "/etc/containers/certs.d/{{ registry_host }}"

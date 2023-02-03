@@ -1,0 +1,22 @@
+---
+common:
+  - ipvsadm
+  - ipset
+  - python3-apt
+  - apt-transport-https
+  - software-properties-common
+  - conntrack
+  - apparmor
+  - libseccomp2
+  - openssl
+  - curl
+  - rsync
+  - socat
+  - unzip
+  - e2fsprogs
+  - xfsprogs
+  - ebtables
+  - bash-completion
+
+ubuntu2204:
+  - chrony

@@ -1,0 +1,5 @@
+---
+app_name: neuvector
+app_namespace: neuvector
+app_version: v5.0.5
+app_chart_version: 2.4.1

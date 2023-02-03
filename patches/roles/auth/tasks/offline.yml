@@ -1,0 +1,15 @@
+- name: create local keyrings file
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: download local keyrings
+  ansible.builtin.get_url:
+    url: "{{ ubuntu_repo }}/gpg"
+    dest: /etc/apt/keyrings/kubespray.asc
+
+- name: create local apt source
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/kubespray.asc] {{ ubuntu_repo }} {{ ansible_distribution_release }} main"
+    state: present

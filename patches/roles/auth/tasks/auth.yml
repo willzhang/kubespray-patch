@@ -1,0 +1,19 @@
+- name: gen ssh_keypair
+  openssh_keypair:
+    path: /root/.ssh/id_rsa
+    size: 2048
+    type: rsa
+  connection: local
+  run_once: true
+
+- name: ssh-keyscan command
+  known_hosts:
+    name: "{{ ansible_ssh_host }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan -t ecdsa-sha2-nistp256 {{ ansible_host }}') }}"
+  connection: local
+
+- name: install ssh key
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+    state: present

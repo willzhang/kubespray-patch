@@ -1,0 +1,11 @@
+registry: {{ registry_host }}
+crio:
+  enabled: true
+controller:
+  pvc:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+manager:
+  svc:
+    type: LoadBalancer

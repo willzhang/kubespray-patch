@@ -1,0 +1,20 @@
+global:
+  imageRegistry: {{ registry_host }}
+grafana:
+  service:
+    type: LoadBalancer
+  adminPassword: prom-operator
+  image:
+    repository: {{ registry_host }}/grafana/grafana
+  sidecar:
+    image:
+      repository: {{ registry_host }}/kiwigrid/k8s-sidecar
+#  ingress:
+#    enabled: true
+#    ingressClassName: nginx
+kube-state-metrics:
+  image:
+    repository: {{ registry_host }}/kube-state-metrics/kube-state-metrics
+prometheus-node-exporter:
+  image:
+    repository: {{ registry_host }}/prometheus/node-exporter

@@ -1,0 +1,7 @@
+openebs v3.3.0
+kubevirt v0.58.0
+calico v3.24.5
+eck-operator v2.5.0
+neuvector v2.4.1
+kube-prometheus-stack v44.3.0
+sriov-network-operator v1.2.0

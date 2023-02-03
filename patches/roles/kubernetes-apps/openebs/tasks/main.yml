@@ -1,0 +1,43 @@
+- name: install app
+  block:
+    - name: 'addons | create kubernetes-apps dir'
+      file:
+        path: "{{ kube_config_dir }}/kubernetes-apps"
+        state: directory
+        mode: 0755
+    
+    - name: 'addons | download helm charts'
+      ansible.builtin.get_url:
+        url: "{{ files_repo }}/github.com/openebs/charts/releases/download/openebs-{{ app_version }}/openebs-{{ app_version }}.tgz"
+        dest: "{{ kube_config_dir }}/kubernetes-apps"
+        mode: '0440'
+
+    - name: Kubernetes Apps | copy helm values file
+      become: yes
+      template:
+        src: "{{ app_name }}.values.yaml.j2"
+        dest: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
+        mode: 0644
+
+    - name: 'addons | install {{ app_name }} helm charts'
+      kubernetes.core.helm:
+        name: '{{ app_name }}'
+        chart_ref: "{{ kube_config_dir }}/kubernetes-apps/{{ app_name }}-{{ app_version }}.tgz"
+        release_namespace: '{{ app_name }}'
+        create_namespace: true
+        values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
+  when:
+    - uninstall is undefined
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: uninstall app
+  block:
+    - name: uninstall app
+      kubernetes.core.helm:
+        name: "{{ app_name }}"
+        state: absent
+        wait: true
+        namespace: '{{ app_namespace }}'
+  when:
+    - uninstall is defined
+    - inventory_hostname == groups['kube_control_plane'][0]

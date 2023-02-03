@@ -1,0 +1,20 @@
+ARG KUBESPRAY_VERSION
+FROM busybox
+ARG KUBESPRAY_VERSION
+ARG KUBERNETES_VERSION
+ARG PACKAGE_VERSION
+ARG CALICO_VERSION
+ARG CALICO_OPERATOR_VERSION
+
+ENV PACKAGES=/kubespray/packages
+ENV PACKAGES_CACHE=/kubespray/packages_cache
+ENV skopeo_bin_version=v1.9.3
+
+RUN apt update -qq \
+    && apt install -q -y --no-install-recommends git wget nano vim
+
+COPY kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}.tar.gz ${PACKAGES}/
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+CMD ["sh"]

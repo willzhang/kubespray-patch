@@ -1,0 +1,73 @@
+version: '3.4'
+services:
+  kubespray:
+    container_name: kubespray
+    image: registry.cn-shenzhen.aliyuncs.com/cnmirror/kubespray:v2.21.0
+    restart: unless-stopped
+    environment:
+      REGISTRY_TYPE: registry
+      REGISTRY_URL: http://kubespray-registry:5000
+      REGISTRY_USERNAME: admin
+      REGISTRY_PASSWORD: Registry12345
+      MINIO_URL: http://kubespray-minio:9000
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    volumes:
+      - $HOME/.ssh:/root/.ssh
+      - kubespray-data:/kubespray
+      - registry-auth:/auth
+      - /etc/containers/certs.d:/etc/containers/certs.d
+    networks:
+      - kubespray
+    depends_on:
+      kubespray-minio:
+        condition: service_healthy
+
+  kubespray-minio:
+    container_name: kubespray-minio
+    image: quay.io/minio/minio:RELEASE.2023-01-12T02-06-16Z
+    command: server /data --console-address ":9090"
+    restart: unless-stopped
+    ports:
+      - 9000:9000
+      - 9090:9090
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    networks:
+      - kubespray
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  kubespray-registry:
+    container_name: kubespray-registry
+    image: docker.io/library/registry:2.8.1
+    restart: unless-stopped
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    ports:
+      - 5000:5000
+    volumes:
+      - registry-data:/registry
+      - registry-auth:/auth
+    networks:
+      - kubespray
+    depends_on:
+      kubespray:
+        condition: service_started
+
+volumes:
+  kubespray-data:
+  registry-data:
+  registry-auth:
+  minio-data:
+
+networks:
+  kubespray:

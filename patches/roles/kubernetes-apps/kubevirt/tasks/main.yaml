@@ -1,0 +1,114 @@
+- name: install app
+  block:
+    - name: "addons | create kubernetes-apps dir"
+      file:
+        path: "{{ kube_config_dir }}/kubernetes-apps"
+        state: directory
+        mode: 0755
+
+    - name: "addons | download virtctl"
+      ansible.builtin.get_url:
+        url: "{{ files_repo }}/github.com/kubevirt/kubevirt/releases/download/{{ app_version }}/virtctl-{{ app_version }}-linux-amd64"
+        dest: "/usr/local/bin/virtctl"
+        mode: "0755"
+
+    - name: "addons | copy cr yaml files"
+      copy:
+        src: "{{ item }}"
+        dest: "{{ kube_config_dir }}/kubernetes-apps"
+        mode: 0755
+      with_items:
+        - kubevirt-cr.yaml
+        - cdi-cr.yaml
+    
+    - name: "addons | copy operator yaml files"
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ kube_config_dir }}/kubernetes-apps/{{ item }}"
+      loop:
+        - kubevirt-operator.yaml
+        - cdi-operator.yaml
+    
+    - name: "addons | apply kubevirt yamls"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/kubevirt-operator.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/kubevirt-cr.yaml"
+
+    - name: "addons | apply cdi operator yamls"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/cdi-operator.yaml"
+
+    - name: "addons | apply cdi cr yamls"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        namespace: cdi
+        wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/cdi-cr.yaml"
+  when:
+    - uninstall is undefined
+    - inventory_hostname == groups["kube_control_plane"][0]
+
+- name: uninstall app
+  block:
+    - name: uninstall kubevirt crd phase1
+      kube:
+        name: "{{ item.name }}"
+        resource: "{{ item.kind }}"
+        namespace: kubevirt
+        state: absent
+        wait: yes
+      loop:
+        - { name: "kubevirt", api_version: "kubevirt.io/v1", kind: "kubevirt" }
+
+    - name: uninstall kubevirt crd phase2
+      kube:
+        name: "{{ item.name }}"
+        resource: "{{ item.kind }}"
+        namespace: kubevirt
+        state: absent
+      loop:
+        - { name: "v1.subresources.kubevirt.io", api_version: "apiregistration.k8s.io/v1", kind: "apiservices" }
+        - { name: "v1.kubevirt.io", api_version: "apiregistration.k8s.io/v1", kind: "apiservices" }
+        - { name: "v1alpha3.kubevirt.io", api_version: "apiregistration.k8s.io/v1", kind: "apiservices" } 
+        - { name: "virt-api-mutator", api_version: "admissionregistration.k8s.io/v1", kind: "mutatingwebhookconfigurations" }
+        - { name: "virt-operator-validator", api_version: "admissionregistration.k8s.io/v1", kind: "validatingwebhookconfigurations" }
+        - { name: "virt-api-validator", api_version: "admissionregistration.k8s.io/v1", kind: "validatingwebhookconfigurations" }
+
+    - name: uninstal kubevirt
+      kube:
+        state: absent
+        filename: "{{ item }}"
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/kubevirt-operator.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/kubevirt-cr.yaml"
+
+    - name: uninstall kubevirt cdi
+      kube:
+        state: absent
+        filename: "{{ item }}"
+        #wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/cdi-cr.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/cdi-operator.yaml"
+
+
+    - name: "addons | delete virtctl bin file"
+      ansible.builtin.file:
+        path: /usr/local/bin/virtctl
+        state: absent
+  when:
+    - uninstall is defined
+    - inventory_hostname == groups["kube_control_plane"][0]

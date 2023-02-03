@@ -1,0 +1,50 @@
+- name: install app
+  block:
+    - name: "addons | create kubernetes-apps dir"
+      file:
+        path: "{{ kube_config_dir }}/kubernetes-apps"
+        state: directory
+        mode: 0755
+
+    - name: "addons | copy files crds.yaml"
+      copy:
+        src: crds.yaml
+        dest: "{{ kube_config_dir }}/kubernetes-apps"
+        mode: 0640
+    
+    - name: "addons | copy {{ app_name }} files operator.yaml"
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ kube_config_dir }}/kubernetes-apps/{{ item }}"
+      loop:
+        - operator.yaml
+        - filebeat_no_autodiscover.yaml    
+
+    - name: "addons | apply yamls"
+      kube:
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        state: latest
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/crds.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/operator.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/filebeat_no_autodiscover.yaml"
+
+  when:
+    - uninstall is undefined
+    - inventory_hostname == groups["kube_control_plane"][0]
+
+- name: uninstall app
+  block:    
+    - name: "addons | uninstall {{ app_name }} yamls"
+      kube:
+        state: absent
+        filename: "{{ item }}"
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/filebeat_no_autodiscover.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/operator.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/crds.yaml"
+      when: uninstall is defined
+  when:
+    - uninstall is defined
+    - inventory_hostname == groups["kube_control_plane"][0]

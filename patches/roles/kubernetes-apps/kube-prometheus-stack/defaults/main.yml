@@ -1,0 +1,5 @@
+---
+app_name: kube-prometheus-stack
+app_namespace: monitoring
+app_version: v0.61.1
+app_chart_version: 44.3.0

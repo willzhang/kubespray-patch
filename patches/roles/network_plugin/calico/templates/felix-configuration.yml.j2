@@ -1,0 +1,12 @@
+apiVersion: projectcalico.org/v3
+kind: FelixConfiguration
+metadata:
+  name: default
+spec:
+  ipipEnabled: {{ calico_ipip_mode != 'Never' }}
+  reportingInterval: {{ calico_felix_reporting_interval }}
+  bpfEnabled: {{ calico_bpf_enabled | bool }}
+  bpfExternalServiceMode: {{ calico_bpf_service_mode }}
+  wireguardEnabled: {{ calico_wireguard_enabled | bool }}
+  logSeverityScreen: {{ calico_felix_log_severity_screen }}
+  vxlanEnabled: {{ calico_vxlan_mode != 'Never' }}

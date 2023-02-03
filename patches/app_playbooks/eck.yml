@@ -1,0 +1,8 @@
+---
+- hosts: kube_control_plane[0]
+  gather_facts: no
+  become: yes
+  roles:
+    - ../roles/kubernetes-apps/eck
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
