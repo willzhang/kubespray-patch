@@ -13,7 +13,7 @@ ARG CALICO_OPERATOR_VERSION
 
 ENV PACKAGES=/kubespray/packages
 ENV PACKAGES_CACHE=/kubespray/packages_cache
-ENV skopeo_bin_version=v1.9.3
+ENV skopeo_bin_version=v1.11.0
 
 # install tools
 RUN mkdir -p $PACKAGES \
@@ -26,16 +26,17 @@ RUN mkdir -p $PACKAGES \
     && chmod +x /usr/local/bin/mc
 
 RUN apt update -qq \
-    && apt install -q -y --no-install-recommends git wget nano vim
+    && apt install -q -y --no-install-recommends git wget nano vim \
+    && rm -rf /var/lib/apt/lists/*
 
-# patch image bug fix
+# patch image bug
 RUN rm -rf /kubespray/ && cd / \
     && git clone https://github.com/kubernetes-sigs/kubespray.git -b ${KUBESPRAY_VERSION} --depth=1 /kubespray && cd /kubespray \
-    && pip install ruamel.yaml jmespath \
     && sed -i "8,12s/^/#/" /kubespray/roles/container-engine/cri-o/tasks/cleanup.yaml \
-    && cp -r /kubespray/roles/network_plugin/calico /kubespray/roles/network_plugin/calico.bak
+    && pip3 install ruamel.yaml jmespath kubernetes \
+    && ansible-galaxy collection install kubernetes.core
 
-# patch kubeadm_sha256sum
+# patch kubeadm certificate to 10 years
 RUN wget -q https://github.com/lework/kubeadm-certs/releases/download/${KUBERNETES_VERSION}/kubeadm-linux-amd64 \
     && export kubeadm_sha256sum=$(sha256sum kubeadm-linux-amd64 | cut -d " " -f 1) \
     && file_path="./roles/download/defaults/main.yml" \
@@ -52,20 +53,22 @@ RUN sed -i "s#container_manager: containerd#container_manager: crio#g" /kubespra
     && sed -i -E '/# .*\{\{ files_repo/s/^# //g' /kubespray/inventory/sample/group_vars/all/mirror.yml \
     && sed -i -E '/# .*\{\{ registry_host/s/^# //g' /kubespray/inventory/sample/group_vars/all/mirror.yml
 
-# patch image
+# patch image support harbor
 RUN sed -i '/^kube_proxy_image_repo:.*/c kube_proxy_image_repo: "{{ kube_image_repo }}/kubernetes/kube-proxy"' /kubespray/roles/download/defaults/main.yml \
     && sed -i '/^pod_infra_image_repo:.*/c pod_infra_image_repo: "{{ kube_image_repo }}/kubernetes/pause"' /kubespray/roles/download/defaults/main.yml \
     && sed -i "/^imageRepository:.*/c imageRepository: {{ kube_image_repo }}/kubernetes" /kubespray/roles/download/templates/kubeadm-images.yaml.j2 \
     && sed -i "/^imageRepository:.*/c imageRepository: {{ kube_image_repo }}/kubernetes" /kubespray/roles/kubernetes/control-plane/templates/kubeadm-config.v1beta3.yaml.j2
 
-# patch calico operator
+# patch extra playbooks
 COPY patches/ /kubespray/
+
+# patch calico
 RUN wget -q "https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VERSION}/manifests/tigera-operator.yaml" \
     && sed -ie "s#quay.io/tigera/operator:${CALICO_OPERATOR_VERSION}#{{ calico_operator_image_repo }}:{{ calico_operator_image_tag }}#g" tigera-operator.yaml \
     && mv tigera-operator.yaml /kubespray/roles/network_plugin/calico/templates/tigera-operator.yml.j2
 
 COPY --from=builder0 /auth /auth
-COPY kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}.tar.gz ${PACKAGES}/
+#COPY kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}.tar.gz ${PACKAGES}/
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
