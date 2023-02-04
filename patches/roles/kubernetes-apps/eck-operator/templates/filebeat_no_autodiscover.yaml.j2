@@ -2,11 +2,10 @@ apiVersion: beat.k8s.elastic.co/v1beta1
 kind: Beat
 metadata:
   name: filebeat
-  namespace: elastic-system
 spec:
   type: filebeat
-  image: {{ registry_host }}/beats/filebeat:8.3.1
-  version: 8.3.1
+  image: {{ registry_host }}/beats/filebeat:{{ filebeat_version }}
+  version: {{ filebeat_version }}
   elasticsearchRef:
     name: elasticsearch
   kibanaRef:
@@ -54,31 +53,26 @@ apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
   name: elasticsearch
-  namespace: elastic-system
 spec:
-  image: {{ registry_host }}/elasticsearch/elasticsearch:8.3.1
-  version: 8.3.1
+  image: {{ registry_host }}/elasticsearch/elasticsearch:{{ elasticsearch_version }}
+  version: {{ elasticsearch_version }}
   nodeSets:
   - name: default
-    count: 1
+    count: 3
     config:
       node.store.allow_mmap: false
-  auth:
-    roles:
-    - secretName: secret-basic-auth
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
   name: kibana
-  namespace: elastic-system
 spec:
-  image: {{ registry_host }}/kibana/kibana:8.3.1
-  version: 8.3.1
+  image: {{ registry_host }}/kibana/kibana:{{ kibana_version }}
+  version: {{ kibana_version }}
   count: 1
   elasticsearchRef:
     name: elasticsearch
   http:
     service:
       spec:
-        type: LoadBalancer
+        type: NodePort

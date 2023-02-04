@@ -131,7 +131,7 @@ dependencies:
       - inventory_hostname == groups['kube_control_plane'][0]
     tags:
       - openebs
-  
+
   - role: kubernetes-apps/kubevirt
     when:
       - kubevirt_enabled
@@ -139,12 +139,12 @@ dependencies:
     tags:
       - kubevirt
 
-  - role: kubernetes-apps/eck
+  - role: kubernetes-apps/eck-operator
     when:
-      - eck_enabled
+      - eck_operator_enabled
       - inventory_hostname == groups['kube_control_plane'][0]
     tags:
-      - eck
+      - eck_operator
 
   - role: kubernetes-apps/neuvector
     when:
@@ -155,15 +155,14 @@ dependencies:
 
   - role: kubernetes-apps/kube-prometheus-stack
     when:
-      - prometheus_enabled
+      - kube_prometheus_stack_enabled
       - inventory_hostname == groups['kube_control_plane'][0]
     tags:
-      - prometheus
+      - kube-prometheus-stack
 
   - role: kubernetes-apps/sriov-network-operator
     when:
-      - sriov_enabled
+      - sriov_network_operator_enabled
       - inventory_hostname == groups['kube_control_plane'][0]
     tags:
-      - sriov
-  
+      - sriov-network-operator
