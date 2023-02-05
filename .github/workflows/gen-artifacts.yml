@@ -33,11 +33,11 @@ jobs:
       - name: checkout kubespray
         run: |
           git clone https://github.com/kubernetes-sigs/kubespray.git -b ${KUBESPRAY_VERSION} --depth=1
-          bash -x kubespray/contrib/offline/generate_list.sh
+          bash kubespray/contrib/offline/generate_list.sh
 
       - name: patch kubernetes-apps
         run: |
-          bash scripts/kubernetes-apps/init.sh
+          bash -x scripts/kubernetes-apps/init.sh
           cat scripts/kubernetes-apps/kubernetes_apps-images.txt >> ${IMAGES_LIST}
           cat scripts/kubernetes-apps/kubernetes_apps-files.txt >> ${FILES_LIST}
 
