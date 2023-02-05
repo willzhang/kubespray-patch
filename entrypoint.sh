@@ -87,7 +87,7 @@ count=$(cat $images_list | wc -l)
 for image in $(cat $images_list)
 do
   let icount+=1
-  if echo ${kube_images} |grep ${image%:*};then registry_host_kube=kubernetes/;else registry_host_kube="";fi
+  if echo ${kube_images} | grep -w -q ${image%:*};then registry_host_kube=kubernetes/;else registry_host_kube="";fi
   log_info "[$icount/$count]copying image: $image -> ${registry_host}/${registry_host_kube}${image#*/}"
   skopeo copy --insecure-policy oci:${package_cache}/images:${image} \
   --src-shared-blob-dir ${package_cache}/images docker://${registry_host}/${registry_host_kube}${image#*/} \
