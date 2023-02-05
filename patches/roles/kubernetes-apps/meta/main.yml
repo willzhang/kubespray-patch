@@ -166,3 +166,10 @@ dependencies:
       - inventory_hostname == groups['kube_control_plane'][0]
     tags:
       - sriov-network-operator
+
+  - role: kubernetes-apps/kube-vip-cloud-provider
+    when:
+      - kube_vip_cloud_provider_enabled
+      - inventory_hostname == groups['kube_control_plane'][0]
+    tags:
+      - kube-vip-cloud-provider

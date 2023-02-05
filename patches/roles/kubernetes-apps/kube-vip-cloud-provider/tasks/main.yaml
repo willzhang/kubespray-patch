@@ -1,0 +1,41 @@
+- name: install app
+  block:
+    - name: "addons | create kubernetes-apps dir"
+      file:
+        path: "{{ kube_config_dir }}/kubernetes-apps"
+        state: directory
+        mode: 0755
+
+    - name: "addons | copy yaml files"
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ kube_config_dir }}/kubernetes-apps/{{ item }}"
+      loop:
+        - kube-vip-cloud-controller.yaml   
+        - kube-vip-configmap.yaml   
+
+    - name: "addons | apply yamls"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/kube-vip-cloud-controller.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/kube-vip-configmap.yaml"
+  when:
+    - uninstall is undefined
+    - inventory_hostname == groups["kube_control_plane"][0]
+
+- name: uninstall app
+  block:
+    - name: uninstal app
+      kube:
+        state: absent
+        filename: "{{ item }}"
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/kube-vip-configmap.yaml"
+        - "{{ kube_config_dir }}/kubernetes-apps/kube-vip-cloud-controller.yaml"
+  when:
+    - uninstall is defined
+    - inventory_hostname == groups["kube_control_plane"][0]

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubevip
+  namespace: kube-system
+data:
+{% if cidr_global is defined %}
+  cidr-global: {{ cidr_global }}
+{% endif %}
+{% if range_global is defined %}
+  range-global: {{ range_global }}                
+{% endif %}

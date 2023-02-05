@@ -2,7 +2,7 @@
 - hosts: all
   gather_facts: true
   roles:
-    - auth
+    - prepare
 
 - name: Check ansible version
   import_playbook: ansible_version.yml

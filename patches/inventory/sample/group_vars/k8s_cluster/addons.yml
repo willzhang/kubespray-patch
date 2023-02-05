@@ -6,6 +6,12 @@ neuvector_enabled: false
 kube_prometheus_stack_enabled: false
 sriov_network_operator_enabled: false
 
+# kube-vip-cloud-provider deployment
+kube_vip_cloud_provider_enabled: false
+# kube_vip_cloud_provider_app_image_tag: v0.0.3
+# range_global: "192.168.72.150-192.168.72.160"
+# cidr_global: "192.168.72.200/29"
+
 # Kubernetes dashboard
 # RBAC required. see docs/getting-started.md for access details.
 # dashboard_enabled: false

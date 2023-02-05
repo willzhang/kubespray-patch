@@ -5,3 +5,4 @@ eck-operator v2.6.1
 neuvector v2.4.1
 kube-prometheus-stack v44.3.0
 sriov-network-operator v1.2.0
+kube-vip-cloud-provider v0.0.4
