@@ -37,7 +37,7 @@ jobs:
 
       - name: patch kubernetes-apps
         run: |
-          bash -x scripts/kubernetes-apps/init.sh
+          bash scripts/kubernetes-apps/init.sh
           cat scripts/kubernetes-apps/kubernetes_apps-images.list >> ${IMAGES_LIST}
           cat scripts/kubernetes-apps/kubernetes_apps-files.list >> ${FILES_LIST}
 
