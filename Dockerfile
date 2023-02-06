@@ -22,9 +22,7 @@ RUN apt update -qq \
     && ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && dpkg-reconfigure --frontend noninteractive tzdata \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN apt install -q -y --no-install-recommends git wget nano vim \
+    && apt install -q -y --no-install-recommends git wget nano vim \
     && rm -rf /var/lib/apt/lists/*
 
 # install tools
