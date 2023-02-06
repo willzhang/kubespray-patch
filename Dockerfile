@@ -81,7 +81,7 @@ RUN wget -q "https://raw.githubusercontent.com/projectcalico/calico/${CALICO_VER
     && sed -ie "s#quay.io/tigera/operator:${CALICO_OPERATOR_VERSION}#{{ calico_operator_image_repo }}:{{ calico_operator_image_tag }}#g" tigera-operator.yaml \
     && mv tigera-operator.yaml /kubespray/roles/network_plugin/calico/templates/tigera-operator.yml.j2
 
-COPY --from=builder0 /auth /auth
+COPY --from=builder0 /auth/htpasswd /auth
 COPY kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}.tar.gz ${PACKAGES}/
 COPY entrypoint.sh /entrypoint.sh
 
