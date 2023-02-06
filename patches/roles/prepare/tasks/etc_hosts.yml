@@ -1,15 +1,15 @@
-- name: Hosts | populate default registry domain address into hosts file
+- name: Hosts | populate registry domain address into hosts file
   lineinfile:
     dest: /etc/hosts
-    regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} repository.kubespray.com"
-    line: "{{ ansible_env['SSH_CLIENT'].split() | first }} repository.kubespray.com"
+    regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.defalut_resolves }}"
+    line: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.defalut_resolves }}"
     state: present
     backup: yes
     unsafe_writes: yes
-  when:
-    - defalut_resolves_enabled is defined
+  with_items: "{{ default_resolves }}"
+  when: default_resolves is defined
 
-- name: Hosts | populate custom registry domain address into hosts file
+- name: Hosts | populate registry domain address into hosts file
   lineinfile:
     dest: /etc/hosts
     regexp: "{{ item.ip_address }} {{ item.domain_name }}"
