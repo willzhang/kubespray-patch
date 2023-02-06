@@ -6,5 +6,5 @@
 
 - name: copy registry ca.crt for container registry
   copy:
-    src: "{{ registry_host }}.crt"
-    dest: "/etc/containers/certs.d/{{ registry_host }}"
+    src: "/etc/containers/certs.d/{{ registry_host }}"
+    dest: "/etc/containers/certs.d"
