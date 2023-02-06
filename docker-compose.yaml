@@ -6,10 +6,10 @@ services:
     restart: unless-stopped
     environment:
       REGISTRY_TYPE: registry
-      REGISTRY_URL: http://kubespray-registry:5000
+      REGISTRY_URL: "https://registry.kubespray.com:5000"
       REGISTRY_USERNAME: admin
       REGISTRY_PASSWORD: Registry12345
-      MINIO_URL: http://kubespray-minio:9000
+      MINIO_URL: "http://minio.kubespray.com:9000"
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
     volumes:
@@ -25,6 +25,7 @@ services:
 
   kubespray-minio:
     container_name: kubespray-minio
+    hostname: minio.kubespray.com
     image: quay.io/minio/minio:RELEASE.2023-01-12T02-06-16Z
     command: server /data --console-address ":9090"
     restart: unless-stopped
@@ -45,6 +46,7 @@ services:
       retries: 3
 
   kubespray-registry:
+    hostname: registry.kubespray.com
     container_name: kubespray-registry
     image: docker.io/library/registry:2.8.1
     restart: unless-stopped
@@ -52,6 +54,11 @@ services:
       REGISTRY_AUTH: htpasswd
       REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
       REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_HTTP_RELATIVEURLS: "true"
+      REGISTRY_HTTP_HOST: "https://registry.kubespray.com:5000"
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_HTTP_TLS_CERTIFICATE: "/auth/certs/registry.kubespray.com.crt"
+      REGISTRY_HTTP_TLS_KEY: "/auth/certs/registry.kubespray.com.key"
     ports:
       - 5000:5000
     volumes:

@@ -1,9 +1,9 @@
 ---
 - import_tasks: auth.yml
 
-- import_tasks: offline.yml
+- import_tasks: etc_hosts.yml
 
-- import_tasks: hosts.yml
+- import_tasks: repository.yml
 
-- include_tasks: registry-certs.yml
+- include_tasks: registry_certs.yml
   when: not crio_registries[0].insecure
