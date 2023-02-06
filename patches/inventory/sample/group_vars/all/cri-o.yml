@@ -1,11 +1,16 @@
-# crio_registries:
-#   - prefix: docker.io
-#     insecure: false
-#     blocked: false
-#     location: registry-1.docker.io
-#     unqualified: true
+crio_registries:
+  - prefix: registry.kubespray.com:5000
+    insecure: false
+    blocked: false
+    location: registry.kubespray.com:5000
+    unqualified: true
+  - prefix: docker.io
+    insecure: false
+    blocked: false
+    location: registry-1.docker.io
+    unqualified: true
 
-# crio_registry_auth:
-#   - registry: 10.0.0.2:5000
-#     username: user
-#     password: pass
+crio_registry_auth:
+  - registry: registry.kubespray.com:5000
+    username: admin
+    password: Registry12345
