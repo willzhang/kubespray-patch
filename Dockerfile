@@ -35,6 +35,14 @@ RUN mkdir -p $PACKAGES \
     && mv mc /usr/local/bin/ \
     && chmod +x /usr/local/bin/mc
 
+# generate registry certs
+RUN mkdir -p /auth/certs \
+    && domain=registry.kubespray.com \
+    && openssl req -newkey rsa:4096 -nodes -sha256 -keyout /auth/certs/${domain}.key \
+       -addext "subjectAltName = DNS:${domain}" \
+       -x509 -days 365 -out /auth/certs/${domain}.crt \
+       -subj "/C=CN/ST=Guangdong/L=Shenzhen/O=example/OU=example/CN=example"
+
 # patch image bug
 RUN rm -rf /kubespray/ && cd / \
     && git clone https://github.com/kubernetes-sigs/kubespray.git -b ${KUBESPRAY_VERSION} --depth=1 /kubespray && cd /kubespray \
