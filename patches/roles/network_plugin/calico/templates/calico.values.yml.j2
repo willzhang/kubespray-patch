@@ -1,0 +1,19 @@
+installation:
+  enabled: true
+  registry: {{ registry_host }}
+  calicoNetwork:
+    bgp: Disabled
+    linuxDataplane: BPF
+    ipPools:
+    - blockSize: 26
+      cidr: {{ calico_pool_cidr | default(kube_pods_subnet) }}
+      encapsulation: VXLAN
+      natOutgoing: Enabled
+      nodeSelector: all()
+tigeraOperator:
+  image: tigera/operator
+  version: {{ calico_operator_image_tag }}
+  registry: {{ registry_host }}
+calicoctl:
+  image: {{ registry_host }}/calico/ctl
+  tag: {{ calico_version }}
