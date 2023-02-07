@@ -1,0 +1,6 @@
+---
+- hosts: kube_control_plane[0]
+  gather_facts: no
+  roles:
+    - { role: kubespray-defaults }
+    - roles/network_plugin/calico
