@@ -1,57 +1,58 @@
----
+- name: 'addons | create kubernetes-apps dir'
+  file:
+    path: "{{ kube_config_dir }}/kubernetes-apps"
+    state: directory
+    mode: 0755
+
 - name: Calico | Copy calicoctl binary from download dir
   copy:
     src: "{{ local_release_dir }}/calicoctl"
     dest: "{{ bin_dir }}/calicoctl"
     mode: 0755
     remote_src: yes
-  when:
-    - inventory_hostname in groups['kube_control_plane']
 
-- name: Calico | Create calico manifests
+- name: Calico | copy calico manifests
   template:
     src: "{{ item.file }}.j2"
     dest: "{{ kube_config_dir }}/{{ item.file }}"
     mode: 0644
   with_items:
-    - {name: tigera-operator, file: tigera-operator.yml, type: dp}
     - {name: kubernetes-services-endpoint, file: kubernetes-services-endpoint.yml, type: cm }
-    - {name: custom-resources, file: custom-resources.yml, type: dp}
     - {name: felix-configuration, file: felix-configuration.yml, type: dp}
   register: calico_node_manifests
-  when:
-    - inventory_hostname in groups['kube_control_plane']
 
-- name: apply tigera-operator
-  shell: "{{ bin_dir }}/kubectl create -f {{ kube_config_dir }}/{{ item }} || true"
-  ignore_errors: true
-  with_items:
-    - tigera-operator.yml
-    - kubernetes-services-endpoint.yml
-  when:
-    - inventory_hostname == groups['kube_control_plane'][0]
+- name: 'addons | download helm charts'
+  ansible.builtin.get_url:
+    url: "{{ files_repo }}/github.com/projectcalico/calico/releases/download/{{ calico_version }}/tigera-operator-{{ calico_version }}.tgz"
+    dest: "{{ kube_config_dir }}/kubernetes-apps"
+    mode: '0440'
 
-- name: waiting operator
-  shell: "{{ bin_dir }}/kubectl -n tigera-operator get pods |grep tigera-operator |awk '{print $3}'"
-  register: pod_status
-  until: pod_status.stdout == "Running"
-  retries: 15
-  delay: 15
-  ignore_errors: true
-  when:
-    - inventory_hostname == groups['kube_control_plane'][0]
+- name: Kubernetes Apps | copy helm values file
+  become: yes
+  template:
+    src: "{{ calico_name }}.values.yml.j2"
+    dest: "{{ kube_config_dir }}//kubernetes-apps/{{ calico_name }}.values.yml"
+    mode: 0644
 
-- name: apply custom-resources
+- name: 'addons | install calico helm charts'
+  kubernetes.core.helm:
+    name: "{{ calico_name }}"
+    chart_ref: "{{ kube_config_dir }}/kubernetes-apps/tigera-operator-{{ calico_version }}.tgz"
+    namespace: '{{ calico_namespace }}'
+    create_namespace: true
+    state: present
+    values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ calico_name }}.values.yml"
+    wait: true
+
+- name: apply kubernetes-services-endpoint
   shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/{{ item }}"
   with_items:
-    - custom-resources.yml
-  when:
-    - inventory_hostname == groups['kube_control_plane'][0]
+    - kubernetes-services-endpoint.yml
 
-- name: waiting apiserver
-  shell: "{{ bin_dir }}/kubectl -n calico-apiserver get pods |grep calico-apiserver | head -n1 | awk '{print $3}'"
-  register: pod_status
-  until: pod_status.stdout == "Running"
+- name: waiting operator
+  shell: "{{ bin_dir }}/kubectl -n calico-apiserver rollout status deploy/calico-apiserver"
+  register: deploy_status
+  until: deploy_status.stdout.find("successfully") != -1
   retries: 15
   delay: 15
   ignore_errors: true
@@ -62,5 +63,3 @@
   shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/{{ item }}"
   with_items:
     - felix-configuration.yml
-  when:
-    - inventory_hostname == groups['kube_control_plane'][0]
