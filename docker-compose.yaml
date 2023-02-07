@@ -16,7 +16,6 @@ services:
       - $HOME/.ssh:/root/.ssh
       - kubespray-data:/kubespray
       - registry-auth:/auth
-      - /etc/containers/certs.d:/etc/containers/certs.d
     networks:
       - kubespray
     depends_on:
