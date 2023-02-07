@@ -1,9 +1,9 @@
 ---
 calico_operator_image_repo: "{{ quay_image_repo }}/tigera/operator"
 calico_operator_image_tag: v1.28.5
-app_name: calico
-app_version: v3.24.5
-app_namespace: tigera-operator
+calico_name: calico
+calico_version: v3.24.5
+calico_namespace: tigera-operator
 
 # the default value of name
 calico_cni_name: k8s-pod-network
