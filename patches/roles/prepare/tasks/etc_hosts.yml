@@ -1,8 +1,8 @@
 - name: Hosts | populate registry domain address into hosts file
   lineinfile:
     dest: /etc/hosts
-    regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.defalut_resolves }}"
-    line: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.defalut_resolves }}"
+    regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.default_resolves }}"
+    line: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.default_resolves }}"
     state: present
     backup: yes
     unsafe_writes: yes
