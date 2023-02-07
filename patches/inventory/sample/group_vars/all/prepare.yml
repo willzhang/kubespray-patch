@@ -1,0 +1,9 @@
+---
+# when registry_host and file_repo in deploy node
+default_resolves:
+  - registry.kubespray.com
+  - minio.kubespray.com
+
+# domain_resolves:
+#   - domain_name: repository.custome.com
+#     ip_address: 192.168.72.16
