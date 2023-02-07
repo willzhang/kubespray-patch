@@ -1,20 +1,21 @@
 ARG KUBESPRAY_VERSION
 
 FROM httpd:2 as builder0
-RUN mkdir /auth \
-    && htpasswd -Bbn admin Registry12345 > /auth/htpasswd
+RUN mkdir -p /auth \
+    && htpasswd -Bbn admin Registry12345 > /etc/containers/auth/htpasswd
 
 FROM quay.io/kubespray/kubespray:${KUBESPRAY_VERSION}
-ARG KUBESPRAY_VERSION
-ARG KUBERNETES_VERSION
-ARG PACKAGE_VERSION
-ARG CALICO_VERSION
-ARG CALICO_OPERATOR_VERSION
+ARG KUBESPRAY_VERSION \
+    KUBERNETES_VERSION \
+    PACKAGE_VERSION \
+    CALICO_VERSION \
+    CALICO_OPERATOR_VERSION
 
-ENV PACKAGES=/kubespray/packages
-ENV PACKAGES_CACHE=/kubespray/packages_cache
-ENV skopeo_bin_version=v1.11.0
-ENV TZ=Asia/Shanghai \
+ENV PACKAGES=/kubespray/packages \
+    PACKAGES_CACHE=/kubespray/packages_cache
+
+ENV skopeo_bin_version=v1.11.0 \
+    TZ=Asia/Shanghai \
     DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -qq \
@@ -36,8 +37,9 @@ RUN mkdir -p $PACKAGES \
     && chmod +x /usr/local/bin/mc
 
 # generate registry certs
-RUN export domain=registry.kubespray.com \
-    && mkdir -p "/auth/certs/${domain}:5000" \
+ENV domain=registry.kubespray.com \
+    certs_dir=/etc/containers/certs.d
+RUN mkdir -p "/etc/containers/certs.d/${domain}:5000" \
     && openssl req -newkey rsa:4096 -nodes -sha256 -keyout /auth/certs/${domain}:5000/${domain}.key \
        -addext "subjectAltName = DNS:${domain}" \
        -x509 -days 365 -out /auth/certs/${domain}:5000/${domain}.crt \
