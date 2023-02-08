@@ -18,14 +18,7 @@ kube_vip_controlplane_enabled: false
 kube_vip_ddns_enabled: false
 kube_vip_services_enabled: false
 kube_vip_leader_election_enabled: "{{ kube_vip_arp_enabled }}"
-kube_vip_bgp_enabled: false
-kube_vip_bgp_routerid:
-kube_vip_local_as: 65000
-kube_vip_bgp_peeraddress:
-kube_vip_bgp_peerpass:
-kube_vip_bgp_peeras: 65000
-kube_vip_bgppeers:
-kube_vip_address: 192.168.72.230
+kube_vip_address:
 kube_vip_enableServicesElection: false
 
 # kube-vip-cloud-provider
