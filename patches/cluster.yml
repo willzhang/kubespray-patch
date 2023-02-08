@@ -95,6 +95,7 @@
     - { role: kubespray-defaults }
     - { role: kubernetes/kubeadm, tags: kubeadm}
     - { role: kubernetes/node-label, tags: node-label }
+    - { role: kubernetes-apps/helm }
     - { role: network_plugin, tags: network }
 
 - hosts: calico_rr
