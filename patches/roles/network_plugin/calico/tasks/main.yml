@@ -34,6 +34,14 @@
     dest: "{{ kube_config_dir }}//kubernetes-apps/{{ calico_name }}.values.yml"
     mode: 0644
 
+- name: "addons | apply kubernetes-services-endpoint"
+  kube:
+    state: latest
+    kubectl: "{{ bin_dir }}/kubectl"
+    filename: "{{ kube_config_dir }}/{{ item }}"
+  with_items:
+    - kubernetes-services-endpoint.yml
+
 - name: 'addons | install calico helm charts'
   kubernetes.core.helm:
     name: "{{ calico_name }}"
@@ -42,11 +50,6 @@
     create_namespace: true
     state: present
     values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ calico_name }}.values.yml"
-
-- name: apply kubernetes-services-endpoint
-  shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/{{ item }}"
-  with_items:
-    - kubernetes-services-endpoint.yml
 
 - name: waiting operator
   shell: "{{ bin_dir }}/kubectl -n calico-apiserver rollout status deploy/calico-apiserver"
