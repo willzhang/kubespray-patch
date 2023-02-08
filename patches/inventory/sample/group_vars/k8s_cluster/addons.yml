@@ -1,4 +1,5 @@
 ---
+# additional plugin
 openebs_enabled: false
 kubevirt_enabled: false
 eck_operator_enabled: false
@@ -6,11 +7,34 @@ neuvector_enabled: false
 kube_prometheus_stack_enabled: false
 sriov_network_operator_enabled: false
 
-# kube-vip-cloud-provider deployment
+# kube-vip
+kube_vip_enabled: false
+kube_vip_version: v0.5.5
+kube_vip_arp_enabled: false
+kube_vip_interface:
+kube_vip_services_interface:
+kube_vip_cidr: 32
+kube_vip_controlplane_enabled: false
+kube_vip_ddns_enabled: false
+kube_vip_services_enabled: false
+kube_vip_leader_election_enabled: "{{ kube_vip_arp_enabled }}"
+kube_vip_bgp_enabled: false
+kube_vip_bgp_routerid:
+kube_vip_local_as: 65000
+kube_vip_bgp_peeraddress:
+kube_vip_bgp_peerpass:
+kube_vip_bgp_peeras: 65000
+kube_vip_bgppeers:
+kube_vip_address: 192.168.72.230
+kube_vip_enableServicesElection: false
+
+# kube-vip-cloud-provider
 kube_vip_cloud_provider_enabled: false
 kube_vip_cloud_provider_image_tag: v0.0.3
-# range_global: "192.168.72.150-192.168.72.160"
-# cidr_global: "192.168.72.200/29"
+# eg: range_global: '192.168.72.150-192.168.72.160' 192.168.72.240-192.168.72.250 
+# eg: cidr_global: 192.168.72.200/29
+range_global:
+cidr_global:
 
 # Kubernetes dashboard
 # RBAC required. see docs/getting-started.md for access details.
