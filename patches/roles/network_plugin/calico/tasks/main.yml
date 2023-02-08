@@ -42,7 +42,6 @@
     create_namespace: true
     state: present
     values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ calico_name }}.values.yml"
-    wait: true
 
 - name: apply kubernetes-services-endpoint
   shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/{{ item }}"
