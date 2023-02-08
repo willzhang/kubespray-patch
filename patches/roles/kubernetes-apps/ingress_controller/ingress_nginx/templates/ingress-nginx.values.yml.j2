@@ -1,0 +1,15 @@
+controller:
+  name: controller
+  image:
+    registry: {{ registry_host }}
+    image: ingress-nginx/controller
+    tag: {{ ingress_nginx_controller_image_tag }}
+    digest: null
+  admissionWebhooks:
+    patch:
+      enabled: true
+      image:
+        registry: {{ registry_host}}
+        image: ingress-nginx/kube-webhook-certgen
+        tag: {{ ingress_nginx_admissionWebhooks_image_tag }}
+        digest: null

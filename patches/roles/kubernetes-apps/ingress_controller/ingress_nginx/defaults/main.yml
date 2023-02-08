@@ -1,0 +1,6 @@
+---
+app_name: ingress-nginx
+app_namespace: ingress-nginx
+app_version: 4.4.2
+ingress_nginx_controller_image_tag: v1.5.1
+ingress_nginx_admissionWebhooks_image_tag: v20220916-gd32f8c343
