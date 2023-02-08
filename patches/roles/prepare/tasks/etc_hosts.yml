@@ -1,12 +1,12 @@
 - name: Hosts | populate registry domain address into hosts file
   lineinfile:
     dest: /etc/hosts
-    regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.default_resolves }}"
-    line: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item.default_resolves }}"
+    regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item }}"
+    line: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item }}"
     state: present
     backup: yes
     unsafe_writes: yes
-  with_items: "{{ default_resolves }}"
+  loop: "{{ default_resolves }}"
   when: default_resolves is defined
 
 - name: Hosts | populate registry domain address into hosts file
