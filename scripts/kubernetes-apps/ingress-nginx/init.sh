@@ -10,7 +10,7 @@ wget -q https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart
 mkdir -p images/shim
 helm template ingress-nginx-${VERSION}.tgz \
 --set controller.image.digest=null \
---set controller.admissionWebhooks.patch.image.digest=null | grep image: | sort -u  | awk -F" " '{print $2}' | tr -d '"' > images/shim/ingress-nginx-files.txt
+--set controller.admissionWebhooks.patch.image.digest=null | grep image: | sort -u  | awk -F" " '{print $2}' | tr -d '"' > images/shim/ingress-nginx-images.txt
 
 mkdir -p  files/shim
 echo "https://github.com/kubernetes/ingress-nginx/releases/download/helm-chart-${VERSION}/ingress-nginx-${VERSION}.tgz" > files/shim/ingress-nginx-files.txt
