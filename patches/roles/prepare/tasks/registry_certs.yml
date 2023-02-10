@@ -1,10 +1,30 @@
-- name: create certs file
-  file:
-    path: "/etc/containers/certs.d/{{ registry_host }}"
-    state: directory
-    mode: '0755'
+- name: copy registry certs for containerd
+  block:
+    - name: create certs file
+      file:
+        path: "/etc/containerd/certs.d/{{ registry_host }}"
+        state: directory
+        mode: '0755'
+        
+    - name: copy registry ca.crt for container registry
+      copy:
+        src: "/etc/containers/certs.d/{{ registry_host }}"
+        dest: "/etc/containerd/certs.d"
+  when:
+    - container_manager == 'containerd'
 
-- name: copy registry ca.crt for container registry
-  copy:
-    src: "/etc/containers/certs.d/{{ registry_host }}"
-    dest: "/etc/containers/certs.d"
+- name: copy registry certs for crio
+  block:
+    - name: create certs file
+      file:
+        path: "/etc/containers/certs.d/{{ registry_host }}"
+        state: directory
+        mode: '0755'
+        
+    - name: copy registry ca.crt for container registry
+      copy:
+        src: "/etc/containers/certs.d/{{ registry_host }}"
+        dest: "/etc/containers/certs.d"	
+  when:
+    - container_manager == 'crio'
+    - not crio_registries[0].insecure
