@@ -1,6 +1,8 @@
 ---
 - import_tasks: auth.yml
 
+- import_tasks: init_os.yml
+
 - import_tasks: etc_hosts.yml
 
 - import_tasks: repository.yml
