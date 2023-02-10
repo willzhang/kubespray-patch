@@ -60,8 +60,7 @@ RUN wget -q https://github.com/lework/kubeadm-certs/releases/download/${KUBERNET
     && rm -rf kubeadm-linux-amd64 yq_linux_amd64
 
 # patch env
-RUN sed -i "s#container_manager: containerd#container_manager: crio#g" /kubespray/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml \
-    && sed -i "s/# calico_bpf_enabled: false/calico_bpf_enabled: true/g" /kubespray/inventory/sample/group_vars/k8s_cluster/k8s-net-calico.yml \
+RUN sed -i "s/# calico_bpf_enabled: false/calico_bpf_enabled: true/g" /kubespray/inventory/sample/group_vars/k8s_cluster/k8s-net-calico.yml \
     && sed -i "s#calico_bpf_service_mode: Tunnel#calico_bpf_service_mode: DSR#g" /kubespray/roles/network_plugin/calico/defaults/main.yml
 
 # patch kube images support harbor
