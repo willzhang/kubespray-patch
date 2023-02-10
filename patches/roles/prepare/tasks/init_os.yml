@@ -1,0 +1,11 @@
+- name: enable hugepages with 1280 pages
+  shell: echo 1280 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+
+- name: enable hugepages permanently
+  shell: echo "vm.nr_hugepages = 1280" > /etc/sysctl.d/app-hugepage.conf
+
+- name: enable iommu
+  shell: echo GRUB_CMDLINE_LINUX_DEFAULT='$GRUB_CMDLINE_LINUX_DEFAULT intel_iommu=on' > /etc/default/grub.d/sriov_iommu.cfg
+
+- name: update-grub
+  shell: update-grub
