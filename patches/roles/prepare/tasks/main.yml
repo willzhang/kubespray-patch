@@ -6,4 +6,3 @@
 - import_tasks: repository.yml
 
 - include_tasks: registry_certs.yml
-  when: not crio_registries[0].insecure
