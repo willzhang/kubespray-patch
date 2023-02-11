@@ -36,7 +36,7 @@ RUN mkdir -p $PACKAGES \
 
 # generate registry certs
 ENV domain=registry.kubespray.com
-RUN mkdir -p "/auth/certs/${domain}:5000" \
+RUN mkdir -p "/auth/certs.d/${domain}:5000" \
     && openssl req -newkey rsa:4096 -nodes -sha256 -keyout /auth/certs.d/${domain}:5000/${domain}.key \
        -addext "subjectAltName = DNS:${domain}" \
        -x509 -days 365 -out /auth/certs.d/${domain}:5000/${domain}.crt \
