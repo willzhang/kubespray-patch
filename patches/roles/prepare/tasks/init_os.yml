@@ -9,3 +9,17 @@
 
 - name: update-grub
   shell: update-grub
+
+- name: create sshd cgroup dir
+  file:
+    path: /etc/systemd/system/ssh.service.d
+    state: directory
+
+- name: copy sshd cgroup file
+  copy:
+    src: cgroup.conf
+    dest: /etc/systemd/system/ssh.service.d
+
+- name: systemd sshd daemon-reload
+  ansible.builtin.systemd:
+    daemon_reexec: true
