@@ -22,8 +22,8 @@ function log_info() {
     echo -e "\033[36m$1 \033[0m"
 }
 
-mkdir -p /etc/containers/certs.d
-[ ! -d "/etc/containers/certs.d/registry.kubespray.com:5000" ] && cp -r /auth/certs/registry.kubespray.com:5000 /etc/containers/certs.d
+mkdir -p /etc/containers
+[ ! -d "/etc/containers/certs.d/registry.kubespray.com:5000" ] && cp -r /auth/* /etc/containers
 
 if [ "${registry_protocal}" == "http" ];then
   tls_verify=false
