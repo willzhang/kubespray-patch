@@ -1,4 +1,4 @@
-- name: Hosts | populate registry domain address into hosts file
+- name: Hosts | populate registry default domain address into hosts file
   lineinfile:
     dest: /etc/hosts
     regexp: "{{ ansible_env['SSH_CLIENT'].split() | first }} {{ item }}"
@@ -9,7 +9,7 @@
   loop: "{{ default_resolves }}"
   when: default_resolves is defined
 
-- name: Hosts | populate registry domain address into hosts file
+- name: Hosts | populate registry custome domain address into hosts file
   lineinfile:
     dest: /etc/hosts
     regexp: "{{ item.ip_address }} {{ item.domain_name }}"
