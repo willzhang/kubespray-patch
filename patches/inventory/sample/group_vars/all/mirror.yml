@@ -105,5 +105,5 @@ gvisor_containerd_shim_runsc_download_url: "{{ files_repo }}/storage.googleapis.
 # containerd_ubuntu_repo_repokey: 'YOURREPOKEY'
 
 registry_host: "{{ registry_hosts | default('registry.kubespray.com:5000') }}"
-files_repo: "{{ files_repos | default('http://minio.kubespray.com:9000/files') }}"
-ubuntu_repo: "{{ ubuntu_repos | default('http://minio.kubespray.com:9000/debs') }}"
+files_repo: "{{ files_repos | default('http://registry.kubespray.com:9000/files') }}"
+ubuntu_repo: "{{ ubuntu_repos | default('http://registry.kubespray.com:9000/debs') }}"
