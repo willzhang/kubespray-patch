@@ -39,4 +39,4 @@
   shell: "{{ bin_dir }}/nerdctl login {{ containerd_registry_auth[0].registry }} -u {{ containerd_registry_auth[0].username }} -p {{ containerd_registry_auth[0].password }}"
   when: 
     - container_manager == 'containerd'
-    - containerd_registry_auth is defained
+    - containerd_registry_auth is defined
