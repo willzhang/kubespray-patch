@@ -7,8 +7,8 @@ registry_username=${REGISTRY_USERNAME:-"admin"}
 registry_password=${REGISTRY_PASSWORD:-"Registry12345"}
 
 minio_url=${MINIO_URL:-"http://kubespray-minio:9000"}
-minio_root_user=${MINIO_ROOT_USER:-"minio"}
-minio_root_password=${MINIO_ROOT_PASSWORD:-"minio123"}
+minio_root_user=${MINIO_ROOT_USER:-"minioadmin"}
+minio_root_password=${MINIO_ROOT_PASSWORD:-"minioadmin"}
 
 registry_protocal=$(echo ${registry_url} | awk -F: '{print $1}')
 registry_host=$(echo ${registry_url} | awk -F// '{print $2}')
