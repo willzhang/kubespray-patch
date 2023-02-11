@@ -9,8 +9,6 @@ env:
   KUBESPRAY_VERSION: v2.21.0
   KUBERNETES_VERSION: v1.25.6
   PACKAGE_VERSION: "1.0"
-  CALICO_VERSION: v3.24.5
-  CALICO_OPERATOR_VERSION: v1.28.5
   REGISTRY: registry.cn-shenzhen.aliyuncs.com/cnmirror
   DIST_PATH: ${{ github.workspace }}/kubespray-offline_${KUBERNETES_VERSION}_${PACKAGE_VERSION}
   IMAGES_LIST: kubespray/contrib/offline/temp/images.list
@@ -67,6 +65,7 @@ jobs:
           wget -q https://github.com/lework/kubeadm-certs/releases/download/${KUBERNETES_VERSION}/kubeadm-linux-amd64
           mv kubeadm-linux-amd64 files/storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubeadm
           cp -r files ${DIST_PATH}
+          cp ${FILES_LIST} ${DIST_PATH}/
 
       - name: generate packages.urls
         uses: docker/build-push-action@v2
@@ -110,5 +109,3 @@ jobs:
             KUBESPRAY_VERSION=${{ env.KUBESPRAY_VERSION }}
             KUBERNETES_VERSION=${{ env.KUBERNETES_VERSION }}
             PACKAGE_VERSION=${{ env.PACKAGE_VERSION }}
-            CALICO_VERSION=${{ env.CALICO_VERSION }}
-            CALICO_OPERATOR_VERSION=${{ env.CALICO_OPERATOR_VERSION }}
