@@ -1,0 +1,66 @@
+- name: install app
+  block:
+    - name: 'addons | create kubernetes-apps dir'
+      file:
+        path: "{{ kube_config_dir }}/kubernetes-apps"
+        state: directory
+        mode: 0755
+    
+    - name: 'addons | download helm charts'
+      ansible.builtin.get_url:
+        url: "{{ files_repo }}/raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts/{{ csi_driver_nfs_version }}/csi-driver-nfs-{{ csi_driver_nfs_version }}.tgz"
+        dest: "{{ kube_config_dir }}/kubernetes-apps"
+        mode: '0440'
+
+    - name: Kubernetes Apps | copy helm values file
+      become: yes
+      template:
+        src: "{{ app_name }}.values.yml.j2"
+        dest: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yml"
+        mode: 0644
+
+    - name: "addons | copy csi-driver-nfs sc yaml"
+      template:
+        src: "csi-driver-nfs-sc.yml.j2"
+        dest: "{{ kube_config_dir }}/kubernetes-apps/csi-driver-nfs-sc.yml"
+        mode: 0644
+
+    - name: 'addons | install {{ app_name }} helm charts'
+      kubernetes.core.helm:
+        name: '{{ app_name }}'
+        chart_ref: "{{ kube_config_dir }}/kubernetes-apps/csi-driver-nfs-{{ csi_driver_nfs_version }}.tgz"
+        release_namespace: '{{ app_namespace }}'
+        create_namespace: true
+        values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yml"
+
+    - name: "addons | apply csi-driver-nfs sc yaml"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        namespace: "{{ app_namespace }}" 
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/csi-driver-nfs-sc.yml"
+
+  when:
+    - uninstall is undefined
+    - inventory_hostname == groups['kube_control_plane'][0]
+
+- name: uninstall app
+  block:
+    - name: uninstal csi-driver-nfs sc
+      kube:
+        state: absent
+        filename: "{{ item }}"
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/csi-driver-nfs-sc.yml"
+
+    - name: uninstall app
+      kubernetes.core.helm:
+        name: "{{ app_name }}"
+        state: absent
+        wait: true
+        namespace: '{{ app_namespace }}'
+  when:
+    - uninstall is defined
+    - inventory_hostname == groups['kube_control_plane'][0]

@@ -1,0 +1,17 @@
+image:
+    nfs:
+        repository: {{ registry_host }}/sig-storage/nfsplugin
+        tag: {{ csi_driver_nfs_nfs_image_tag }}
+        pullPolicy: IfNotPresent
+    csiProvisioner:
+        repository: {{ registry_host }}/sig-storage/csi-provisioner
+        tag: {{ csi_driver_nfs_csiProvisioner_image_tag }}
+        pullPolicy: IfNotPresent
+    livenessProbe:
+        repository: {{ registry_host }}/sig-storage/livenessprobe
+        tag: {{ csi_driver_nfs_livenessProbe_image_tag }}
+        pullPolicy: IfNotPresent
+    nodeDriverRegistrar:
+        repository: {{ registry_host }}/sig-storage/csi-node-driver-registrar
+        tag: {{ csi_driver_nfs_nodeDriverRegistrar_image_tag }}
+        pullPolicy: IfNotPresent

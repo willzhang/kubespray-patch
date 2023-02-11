@@ -1,0 +1,8 @@
+---
+app_name: csi-driver-nfs
+app_namespace: kube-system
+csi_driver_nfs_version: v4.1.0
+csi_driver_nfs_nfs_image_tag: v4.1.0
+csi_driver_nfs_csiProvisioner_image_tag: v3.2.0
+csi_driver_nfs_livenessProbe_image_tag: v2.7.0
+csi_driver_nfs_nodeDriverRegistrar_image_tag: v2.5.1

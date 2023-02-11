@@ -132,6 +132,13 @@ dependencies:
     tags:
       - openebs
 
+  - role: kubernetes-apps/csi-driver-nfs
+    when:
+      - csi_driver_nfs_enabled
+      - inventory_hostname == groups['kube_control_plane'][0]
+    tags:
+      - csi-driver-nfs
+
   - role: kubernetes-apps/kubevirt
     when:
       - kubevirt_enabled

@@ -1,13 +1,20 @@
 ---
-# additional plugin
+# openebs helm app
 openebs_enabled: false
+openebs_nfs_provisioner_enabled: false
+
 kubevirt_enabled: false
 eck_operator_enabled: false
 neuvector_enabled: false
 kube_prometheus_stack_enabled: false
 sriov_network_operator_enabled: false
 
-# kube-vip
+# csi-driver-nfs helm app
+csi_driver_nfs_enabled: false
+csi_driver_nfs_server: nfs-server.default.svc.cluster.local
+csi_driver_nfs_share: /
+
+# kube-vip deployment
 kube_vip_enabled: false
 kube_vip_version: v0.5.5
 kube_vip_arp_enabled: false

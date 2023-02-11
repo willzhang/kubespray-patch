@@ -7,13 +7,10 @@ export readonly VERSION=${2:-$(basename "$PWD")}
 VERSION=${VERSION#v}
 wget -q https://github.com/openebs/charts/releases/download/openebs-${VERSION}/openebs-${VERSION}.tgz
 
-utils_tag=$(helm show values openebs-${VERSION}.tgz --jsonpath {.helper.imageTag})
-localprovisioner_tag=$(helm show values openebs-${VERSION}.tgz --jsonpath {.localprovisioner.imageTag})
-
 mkdir -p images/shim
-cat  <<EOF> images/shim/openebs-images.txt
-docker.io/openebs/linux-utils:$utils_tag
-docker.io/openebs/provisioner-localpv:${localprovisioner_tag}
-EOF
+helm template openebs-${VERSION}.tgz -f openebs.values.yaml | grep image: | awk -F" " '{print $2}' | tr -d '"' | sort -u > images/shim/${NAME}-images.txt
+utils_tag=$(helm show values openebs-${VERSION}.tgz --jsonpath {.helper.imageTag})
+echo "docker.io/openebs/linux-utils:$utils_tag" >> images/shim/${NAME}-images.txt
+
 mkdir -p  files/shim
 echo "https://github.com/openebs/charts/releases/download/openebs-${VERSION}/openebs-${VERSION}.tgz" > files/shim/openebs-files.txt

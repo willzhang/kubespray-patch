@@ -7,3 +7,4 @@ kube-prometheus-stack v44.3.0
 sriov-network-operator v1.2.0
 kube-vip-cloud-provider v0.0.4
 ingress-nginx v4.4.2
+csi-driver-nfs v4.1.0
