@@ -20,4 +20,5 @@ common:
 
 ubuntu2204:
   - chrony
+  - nfs-kernel-server
   - nfs-common
