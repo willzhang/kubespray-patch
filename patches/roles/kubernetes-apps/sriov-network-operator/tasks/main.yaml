@@ -64,11 +64,18 @@
 
 - name: uninstall app
   block:
-    - name: uninstall app
+    - name: uninstall sriov helm app
       kubernetes.core.helm:
         name: "{{ app_name }}"
         state: absent
         namespace: '{{ app_namespace }}'
+
+    - name: uninstall sriov-network-config-daemon
+      shell: "{{ bin_dir }}/kubectl -n sriov-network-operator delete daemonset.apps/sriov-network-config-daemon"
+
+    - name: delete sriov namespace
+      shell: "{{ bin_dir }}/kubectl -n sriov-network-operator delete ns sriov-network-operator"
+
   when:
     - uninstall is defined
     - inventory_hostname == groups['kube_control_plane'][0]
