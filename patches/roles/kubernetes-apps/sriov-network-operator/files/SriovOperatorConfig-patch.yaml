@@ -5,4 +5,4 @@ metadata:
   namespace: sriov-network-operator
 spec:
   configDaemonNodeSelector:
-    node-role.kubernetes.io/worker: "true"
+    node-role.kubernetes.io/worker: "sriov"
