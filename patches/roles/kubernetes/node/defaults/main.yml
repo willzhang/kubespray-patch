@@ -117,9 +117,9 @@ kubelet_max_pods: 110
 kubelet_pod_pids_limit: -1
 
 ## Support parameters to be passed to kubelet via kubelet-config.yaml
-kubelet_config_extra_args:
-  cpuManagerPolicy: static
-  topologyManagerPolicy: single-numa-node
+kubelet_config_extra_args: {}
+#  cpuManagerPolicy: static
+#  topologyManagerPolicy: single-numa-node
 
 ## Parameters to be passed to kubelet via kubelet-config.yaml when cgroupfs is used as cgroup driver
 kubelet_config_extra_args_cgroupfs:
