@@ -2,6 +2,7 @@
 common:
   - ipvsadm
   - ipset
+  - python3-minimal
   - python3-apt
   - apt-transport-https
   - software-properties-common
