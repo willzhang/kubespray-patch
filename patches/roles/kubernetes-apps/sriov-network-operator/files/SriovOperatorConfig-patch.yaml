@@ -1,0 +1,8 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovOperatorConfig
+metadata:
+  name: default
+  namespace: sriov-network-operator
+spec:
+  configDaemonNodeSelector:
+    node-role.kubernetes.io/worker: "true"
