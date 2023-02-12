@@ -41,8 +41,8 @@ cidr_global:
 
 # nfs server host
 nfs_server_host_enabled: false
-nfs_exports:
-  - /nfs-share
+# nfs_exports:
+#   - /nfs-share
 
 # Kubernetes dashboard
 # RBAC required. see docs/getting-started.md for access details.
