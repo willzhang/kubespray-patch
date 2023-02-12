@@ -18,6 +18,14 @@
         dest: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
         mode: 0644
 
+    - name: "addons | copy SriovOperatorConfig-patch.yaml files"
+      copy:
+        src: "{{ item }}"
+        dest: "{{ kube_config_dir }}/kubernetes-apps"
+        mode: 0755
+      with_items:
+        - SriovOperatorConfig-patch.yaml
+
     - name: 'addons | install {{ app_name }} helm charts'
       kubernetes.core.helm:
         name: '{{ app_name }}'
@@ -25,6 +33,31 @@
         release_namespace: '{{ app_name }}'
         create_namespace: true
         values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
+
+    - name: "addons | label nodes"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/SriovOperatorConfig-patch.yaml"
+
+    - name: Set label to node
+      command: >-
+          {{ kubectl }} label node {{ inventory_hostname }} node-role.kubernetes.io/worker=sriov --overwrite=true
+      delegate_to: "{{ groups['kube_control_plane'][0] }}"
+      changed_when: false
+
+    - name: "addons | apply SriovOperatorConfig-patch.yaml"
+      kube:
+        state: latest
+        kubectl: "{{ bin_dir }}/kubectl"
+        filename: "{{ item }}"
+        wait: yes
+      with_items:
+        - "{{ kube_config_dir }}/kubernetes-apps/SriovOperatorConfig-patch.yaml"
+
   when:
     - uninstall is undefined
     - inventory_hostname == groups['kube_control_plane'][0]
