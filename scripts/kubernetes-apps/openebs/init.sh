@@ -9,6 +9,7 @@ wget -q https://github.com/openebs/charts/releases/download/openebs-${VERSION}/o
 
 mkdir -p images/shim
 helm template openebs-${VERSION}.tgz -f openebs.values.yaml | grep image: | awk -F" " '{print $2}' | tr -d '"' | sort -u > images/shim/${NAME}-images.txt
+sed -i 's/^/docker.io\//' images/shim/${NAME}-images.txt
 utils_tag=$(helm show values openebs-${VERSION}.tgz --jsonpath {.helper.imageTag})
 echo "docker.io/openebs/linux-utils:$utils_tag" >> images/shim/${NAME}-images.txt
 
