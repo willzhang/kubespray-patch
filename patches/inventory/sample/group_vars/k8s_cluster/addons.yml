@@ -10,7 +10,7 @@ kube_prometheus_stack_enabled: false
 
 # sriov network operator
 sriov_network_operator_enabled: false
-# sriov_policy_enabled: false
+sriov_policy_enabled: false
 
 # csi-driver-nfs helm app
 csi_driver_nfs_enabled: false
