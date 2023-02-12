@@ -1,0 +1,40 @@
+- name: "addons | create kubernetes-apps dir"
+  file:
+    path: "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator"
+    state: directory
+    mode: 0755
+
+- copy:
+    src: "{{ item }}"
+    dest: "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator"
+    owner: root
+    mode: 0755
+  with_fileglob:
+    - "init.sh"
+    - "sample_pod.yaml"
+    - "networks/*"
+    - "policys/*"
+
+- name: "addons | export sriovnetworknodestates"
+  shell: "kubectl -n sriov-network-operator get sriovnetworknodestates.sriovnetwork.openshift.io -o yaml > {{ kube_config_dir }}/kubernetes-apps/sriovnetworknodestates.yaml"
+
+- name: 'addons | get sriovnetworknodestates'
+  shell: " bash init.sh"
+  args:
+    chdir: {{ kube_config_dir }}/kubernetes-apps/
+
+- name: "addons | apply network policy yamls"
+  kube:
+    state: latest
+    kubectl: "{{ bin_dir }}/kubectl"
+    filename: "{{ item }}"
+    wait: yes
+  with_items:
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/networks/network_1.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/networks/network_2.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/networks/network_3.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/networks/network_4.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/policys/policy_1.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/policys/policy_2.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/policys/policy_3.yaml"
+    - "{{ kube_config_dir }}/kubernetes-apps/sriov-network-operator/policys/policy_4.yaml"

@@ -7,7 +7,10 @@ kubevirt_enabled: false
 eck_operator_enabled: false
 neuvector_enabled: false
 kube_prometheus_stack_enabled: false
+
+# sriov network operator
 sriov_network_operator_enabled: false
+# sriov_policy_enabled: false
 
 # csi-driver-nfs helm app
 csi_driver_nfs_enabled: false
@@ -35,6 +38,9 @@ kube_vip_cloud_provider_image_tag: v0.0.3
 # eg: cidr_global: 192.168.72.200/29
 range_global:
 cidr_global:
+
+# nfs server host
+nfs_server_host_enabled: false
 
 # Kubernetes dashboard
 # RBAC required. see docs/getting-started.md for access details.

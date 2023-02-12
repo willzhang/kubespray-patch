@@ -39,3 +39,7 @@
   when:
     - uninstall is defined
     - inventory_hostname == groups['kube_control_plane'][0]
+
+- include_tasks: sriov-policy.yaml
+  when:
+    - sriov_policy_enabled

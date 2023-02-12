@@ -1,0 +1,18 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: policy-2-vfio-pci
+  namespace: sriov-network-operator
+spec:
+  nodeSelector:
+    feature.node.kubernetes.io/network-sriov.capable: "true"
+  resourceName: intelnics2
+  priority: 99
+  mtu: 9000
+  numVfs: 8
+  nicSelector:
+    deviceID: "159b"
+    rootDevices:
+      - "0000:19:00.1"
+    vendor: "8086"
+  deviceType: vfio-pci

@@ -1,0 +1,9 @@
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetwork
+metadata:
+  name: sriovnetwork3
+  namespace: sriov-network-operator
+spec:
+  ipam: '{ "type": "static" }'
+  capabilities: '{ "ips": true }'
+  resourceName: intelnics3

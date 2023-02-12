@@ -8,3 +8,8 @@
 - import_tasks: repository.yml
 
 - include_tasks: registry_certs.yml
+
+- include_tasks: nfs_server.yml
+  when:
+    - nfs_server_host_enabled
+    - inventory_hostname == groups['kube_control_plane'][0]

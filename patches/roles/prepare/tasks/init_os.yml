@@ -23,21 +23,3 @@
 - name: systemd sshd daemon-reload
   ansible.builtin.systemd:
     daemon_reexec: true
-
-- name: check if sources.list exists
-  stat:
-    path: "/etc/apt/sources.list"
-  register: result
-
-- name: backup sources.list
-  copy:
-    src: /etc/apt/sources.list
-    dest: /etc/apt/sources.list.k8s.bak
-    remote_src: yes
-  when: result.stat.exists
-
-- name: remove sources.list
-  file:
-    path: /etc/apt/sources.list  
-    state: absent   
-  when: result.stat.exists

@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testpod1
+  annotations:
+    k8s.v1.cni.cncf.io/networks: '[
+{"name": "sriovnetwork1",
+"namespace": "sriov-network-operator",
+"interface": "net1"
+},
+{"name": "sriovnetwork2",
+"namespace": "sriov-network-operator",
+"interface": "net2"
+},
+{"name": "sriovnetwork3",
+"namespace": "sriov-network-operator",
+"interface": "net3",
+"ips": ["1.1.1.1/24"]
+},
+{"name": "sriovnetwork4",
+"namespace": "sriov-network-operator",
+"interface": "net4",
+"ips": ["1.1.1.2/24"]
+}]'
+spec:
+  containers:
+  - name: appcntr1
+    image: docker.io/busybox
+    imagePullPolicy: IfNotPresent
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 300000; done;" ]
+    resources:
+      requests:
+        openshift.io/intelnics1: '1'
+        openshift.io/intelnics2: '1'
+        openshift.io/intelnics3: '1'
+        openshift.io/intelnics4: '1'
+      limits:
+        openshift.io/intelnics1: '1'
+        openshift.io/intelnics2: '1'
+        openshift.io/intelnics3: '1'
+        openshift.io/intelnics4: '1'

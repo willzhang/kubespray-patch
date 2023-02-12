@@ -2,5 +2,3 @@
 app_name: sriov-network-operator
 app_namespace: sriov-network-operator
 app_version: 1.2.0
-
-
