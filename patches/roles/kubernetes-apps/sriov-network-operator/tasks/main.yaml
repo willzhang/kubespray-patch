@@ -34,20 +34,20 @@
         create_namespace: true
         values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
 
-    - name: "addons | label nodes"
-      kube:
-        state: latest
-        kubectl: "{{ bin_dir }}/kubectl"
-        filename: "{{ item }}"
-        wait: yes
-      with_items:
-        - "{{ kube_config_dir }}/kubernetes-apps/SriovOperatorConfig-patch.yaml"
-
-    - name: Set label to node
-      command: >-
-          {{ kubectl }} label node {{ inventory_hostname }} node-role.kubernetes.io/worker=sriov --overwrite=true
+    - name: Set sriov label for node
+      command: "{{ bin_dir }}/kubectl label nodes {{ inventory_hostname }} node-role.kubernetes.io/worker=sriov --overwrite=true"
       delegate_to: "{{ groups['kube_control_plane'][0] }}"
       changed_when: false
+
+    - name: waiting operator
+      shell: "{{ bin_dir }}/kubectl -n sriov-network-operator rollout status deployment.apps/sriov-network-operator"
+      register: deploy_status
+      until: deploy_status.stdout.find("successfully") != -1
+      retries: 15
+      delay: 15
+      ignore_errors: true
+      when:
+        - inventory_hostname == groups['kube_control_plane'][0]
 
     - name: "addons | apply SriovOperatorConfig-patch.yaml"
       kube:
