@@ -3,10 +3,7 @@ kind: Pod
 metadata:
   name: kubespray
 spec:
-  hostAliases:
-  - ip: "127.0.0.1"
-    hostnames:
-    - "registry.kubespray.com"
+  hostNetwork: true
   containers:
   - name: kubespray
     image: registry.cn-shenzhen.aliyuncs.com/cnmirror/kubernetes:v1.25.6-1.0
@@ -45,23 +42,12 @@ spec:
     - -c
     args:
     - minio server /data --console-address :9090
-    ports:
-      - containerPort: 9000
-        hostPort: 9000
-        protocol: TCP
-      - containerPort: 9090
-        hostPort: 9090
-        protocol: TCP
     volumeMounts:
     - mountPath: /data
       name: minio-data
   - name: registry
     image: docker.io/library/registry:2.8.1
     imagePullPolicy: IfNotPresent
-    ports:
-      - containerPort: 5000
-        hostPort: 5000
-        protocol: TCP
     env:
     - name: REGISTRY_AUTH
       value: "htpasswd"
