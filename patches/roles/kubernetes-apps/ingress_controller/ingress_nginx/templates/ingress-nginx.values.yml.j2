@@ -13,3 +13,5 @@ controller:
         image: ingress-nginx/kube-webhook-certgen
         tag: {{ ingress_nginx_admissionWebhooks_image_tag }}
         digest: null
+  service:
+    type: NodePort
