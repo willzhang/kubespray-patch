@@ -9,7 +9,8 @@ spec:
     - "registry.kubespray.com"
   containers:
   - name: kubespray
-    image: registry.cn-shenzhen.aliyuncs.com/cnmirror/kubespray:v1.25.6-1.0
+    image: registry.cn-shenzhen.aliyuncs.com/cnmirror/kubernetes:v1.25.6-1.0
+    imagePullPolicy: IfNotPresent
     env:
     - name: REGISTRY_TYPE
       value: "registry"
@@ -38,6 +39,7 @@ spec:
         name: ssh-key
   - name: minio
     image: quay.io/minio/minio:RELEASE.2023-01-12T02-06-16Z
+    imagePullPolicy: IfNotPresent
     command:
     - /bin/bash
     - -c
@@ -55,6 +57,7 @@ spec:
       name: minio-data
   - name: registry
     image: docker.io/library/registry:2.8.1
+    imagePullPolicy: IfNotPresent
     ports:
       - containerPort: 5000
         hostPort: 5000
