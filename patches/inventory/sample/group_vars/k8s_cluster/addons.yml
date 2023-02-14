@@ -1,15 +1,15 @@
 ---
 # openebs helm app
-openebs_enabled: false
-openebs_nfs_provisioner_enabled: false
+openebs_enabled: true
+openebs_nfs_provisioner_enabled: true
 
 kubevirt_enabled: false
 eck_operator_enabled: false
 neuvector_enabled: false
-kube_prometheus_stack_enabled: false
+kube_prometheus_stack_enabled: true
 
 # sriov network operator
-sriov_network_operator_enabled: false
+sriov_network_operator_enabled: true
 sriov_policy_enabled: false
 
 # csi-driver-nfs helm app
@@ -58,7 +58,7 @@ registry_enabled: false
 # registry_disk_size: "10Gi"
 
 # Metrics Server deployment
-metrics_server_enabled: false
+metrics_server_enabled: true
 # metrics_server_container_port: 4443
 # metrics_server_kubelet_insecure_tls: true
 # metrics_server_metric_resolution: 15s
@@ -142,7 +142,7 @@ rbd_provisioner_enabled: false
 # rbd_provisioner_reclaim_policy: Delete
 
 # Nginx ingress controller deployment
-ingress_nginx_enabled: false
+ingress_nginx_enabled: true
 # ingress_nginx_host_network: false
 ingress_publish_status_address: ""
 # ingress_nginx_nodeselector:
