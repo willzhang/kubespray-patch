@@ -11,6 +11,11 @@
     mode: 0755
     remote_src: yes
 
+- name: Calico | Copy ServiceAccount-patch.yaml
+  copy:
+    src: ServiceAccount-patch.yaml
+    dest: "{{ kube_config_dir }}/ServiceAccount-patch.yaml"
+
 - name: Calico | copy calico manifests
   template:
     src: "{{ item.file }}.j2"
@@ -65,3 +70,8 @@
   shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/{{ item }}"
   with_items:
     - felix-configuration.yml
+
+- name: apply ServiceAccount-patch
+  shell: "{{ bin_dir }}/kubectl apply -f {{ kube_config_dir }}/{{ item }}"
+  with_items:
+    - ServiceAccount-patch.yaml
