@@ -15,7 +15,7 @@
       become: yes
       template:
         src: "{{ app_name }}.values.yaml.j2"
-        dest: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
+        dest: "{{ kube_config_dir }}/kubernetes-apps/{{ app_name }}.values.yaml"
         mode: 0644
 
     - name: 'addons | install {{ app_name }} helm charts'
@@ -24,7 +24,7 @@
         chart_ref: "{{ kube_config_dir }}/kubernetes-apps/kube-prometheus-stack-{{ app_chart_version }}.tgz"
         release_namespace: '{{ app_namespace }}'
         create_namespace: true
-        values_files: "{{ kube_config_dir }}//kubernetes-apps/{{ app_name }}.values.yaml"
+        values_files: "{{ kube_config_dir }}/kubernetes-apps/{{ app_name }}.values.yaml"
   when:
     - uninstall is undefined
     - inventory_hostname == groups['kube_control_plane'][0]
