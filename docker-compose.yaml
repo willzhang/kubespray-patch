@@ -2,7 +2,7 @@ version: '3.4'
 services:
   kubespray:
     container_name: kubespray
-    image: registry.cn-shenzhen.aliyuncs.com/cnmirror/kubespray:v2.21.0
+    image: registry.cn-shenzhen.aliyuncs.com/cnmirror/kubernetes:v1.25.6-1.0
     restart: unless-stopped
     environment:
       REGISTRY_TYPE: registry
@@ -10,8 +10,8 @@ services:
       REGISTRY_USERNAME: admin
       REGISTRY_PASSWORD: Registry12345
       MINIO_URL: "http://minio.kubespray.com:9000"
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
     volumes:
       - $HOME/.ssh:/root/.ssh
       - kubespray-data:/kubespray
@@ -31,9 +31,6 @@ services:
     ports:
       - 9000:9000
       - 9090:9090
-    environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
     networks:
       - kubespray
     volumes:
